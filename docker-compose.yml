@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  web:
+    container_name: reef_timeit_web
+    build: .
+    working_dir: /app
+    environment:
+      - FLASK_APP=timeit_app.py
+      - LOG_DIR=/logs
+      - SQLALCHEMY_MIGRATIONS_DIR=/migrations
+      - MYSQL_CONNECTOR=mysqlconnector
+      - MYSQL_HOST=db:3306
+    env_file:
+      - .env
+    volumes:
+      - .:/app:ro
+      - ./logs:/logs:rw
+      - ./migrations:/migrations:rw
+    ports:
+      - 8000:5000
+    links:
+      - db
+    restart: unless-stopped
+    depends_on:
+      - db
+    command: sh -c "sleep 30 && ./timeit_app.sh $MIGRATE"
+
+  db:
+    container_name: reef_timeit_db
+    image: mysql:8.0.22
+    env_file:
+      - .env
+    expose:
+      - 3306
+    volumes:
+      - ./mysql_data:/var/lib/mysql:rw
+    restart: unless-stopped
