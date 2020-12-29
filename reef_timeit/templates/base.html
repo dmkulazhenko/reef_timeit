@@ -1,0 +1,39 @@
+{% extends "bootstrap/base.html" %}
+  
+{% block title %}
+    {% if title %}{{ title }} - TimeIt{% else %}{{"Reef - TimeIt"}}{% endif %}
+{% endblock %}
+
+{% block navbar %}
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">TimeIt</a>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {{ 'alert-' + message.color }}" role="alert">{{ message.msg }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block app_content %}{% endblock %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment() }}
+    {{ moment.lang(g.locale) }}
+    <script>
+        jQuery(document).ready(function($) {
+            $(".clickable-row").click(function() {
+                window.open($(this).data("href"));
+            });
+        });
+    </script>
+{% endblock %}

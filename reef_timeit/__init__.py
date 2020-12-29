@@ -4,14 +4,21 @@ from typing import Type
 
 from flask import Flask
 from flask_bootstrap import Bootstrap
+from flask_crontab import Crontab
 from flask_migrate import Migrate
+from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 
+from reef_hub_api import HubClient
 from reef_timeit.config import Config
 
 bootstrap = Bootstrap()
+crontab = Crontab()
 db = SQLAlchemy()
 migrate = Migrate()
+moment = Moment()
+
+hub_client = HubClient()
 
 
 def create_app(config_class: Type = Config) -> Flask:
@@ -20,12 +27,18 @@ def create_app(config_class: Type = Config) -> Flask:
 
     # Connect plugins to Flask
     bootstrap.init_app(app)
+    crontab.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
+    moment.init_app(app)
 
     # Register blueprints
     from .main import bp as main_bp
+
     app.register_blueprint(main_bp)
+
+    # Register cron jobs
+    from .crontab_jobs import fetcher_job
 
     # Setup logging
     app.config["LOG_DIR"].mkdir(exist_ok=True)
@@ -43,8 +56,6 @@ def create_app(config_class: Type = Config) -> Flask:
     )
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
-
     app.logger.setLevel(logging.INFO)
-    app.logger.info("TimeIt Startup")
 
     return app

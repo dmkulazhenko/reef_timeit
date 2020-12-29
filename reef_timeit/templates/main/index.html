@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+
+{% block app_content %}
+    <div class="row">
+        <h3>Activity Report (time in seconds)</h3>
+        <h5>From {{ moment(start_time[0]).format("MMM Do YYYY h:mm a") }}   to   {{ moment(stop_time[0]).format("MMM Do YYYY h:mm a") }}</h5>
+        {% if activities.users == [] %}
+            <div style="margin-top: 2em">
+                <h4>No data? or all are so lazy :)</h4>
+            </div>
+        {% else %}
+            <table class="table table-hover table-striped" style="margin-top: 2em">
+                <tr>
+                    <th>#</th>
+                    {% for user in activities.users %}
+                        <th>{{ user.name }}</th>
+                    {% endfor %}
+                </tr>
+                {% for project, users_stat in activities.stats.items() %}
+                    <tr>
+                        <td><b>{{ project.name }}</b></td>
+                        {% for user in activities.users %}
+                            <td>{{ users_stat.get(user, 0) }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+            <div class="row" style="margin-top: 1em">
+                <p>If you need csv version of this page — <a href="{{ url_for("main.csv_report", start_time=start_time[1], stop_time=stop_time[1]) }}">press here</a>.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="row" style="margin-top: 5em">
+        <p>Custom time range:</p>
+
+        <label for="from">From: </label>
+        <input type="date" id="from" name="start_time" min="1970-01-01" max="3000-01-01">
+
+        <label for="to">To: </label>
+        <input type="date" id="to" name="stop_time" min="1970-01-01" max="3000-01-01">
+
+        <button type="button" class="btn" onclick="get_report(document.getElementById('from'), document.getElementById('to'))">Get report!</button>
+    </div>
+
+    <div class="row" style="margin-top: 2em">
+        <p>Data updates every 15 minutes.</p>
+        <p>If you need fresh data right now — <a href="{{ url_for("main.update") }}">press here</a>.</p>
+        <p>Data update is synchronous, so request will be pretty long.</p>
+    </div>
+
+    <script>
+        function get_timestamp(date) {
+            timestamp = new Date(date).getTime();
+            return timestamp / 1000;
+        }
+
+        function get_report(start, stop) {
+            start = get_timestamp(start.value)
+            stop = get_timestamp(stop.value) + 86399;
+
+            window.location.replace("/?start_time=" + start + "&stop_time=" + stop)
+        }
+    </script>
+{% endblock %}
