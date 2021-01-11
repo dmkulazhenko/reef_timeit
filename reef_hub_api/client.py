@@ -36,7 +36,11 @@ class HubClient:
 
         headers = _add_auth_credentials({} if headers is None else headers)
         request = requests.request(
-            method=method, url=url, headers=headers, **request_kwargs
+            method=method,
+            url=url,
+            timeout=Config.REQUEST_TIMEOUT,
+            headers=headers,
+            **request_kwargs,
         )
 
         if request.status_code == requests.codes.unauthorized:

@@ -11,6 +11,9 @@ class Config:
     HUB_EMAIL = os.environ.get("HUB_EMAIL")
     HUB_PASSWORD = os.environ.get("HUB_PASSWORD")
 
+    # Requests
+    REQUEST_TIMEOUT = 60
+
     # Api Endpoints
     _API_URL = "https://api.hubstaff.com/v1/"
 

@@ -15,7 +15,11 @@ class HubAuth:
 
     def authenticate(self) -> str:
         logger.info("Obtaining a new auth token")
-        request = requests.post(Config.API_END_AUTH, **Config.get_auth_data())
+        request = requests.post(
+            Config.API_END_AUTH,
+            timeout=Config.REQUEST_TIMEOUT,
+            **Config.get_auth_data(),
+        )
 
         if request.status_code == requests.codes.ok:
             self.auth_token = request.json()["user"]["auth_token"]
